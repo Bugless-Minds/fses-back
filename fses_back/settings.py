@@ -75,8 +75,16 @@ WSGI_APPLICATION = "fses_back.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "fses",
+        "USER": "postgres",
+        "PASSWORD": "bugless2025",
+        "HOST": "157.230.45.158",
+        "PORT": "5432",
+        # "OPTIONS": {
+        #     "service": "my_service",
+        #     "passfile": .my_pgpass"),
+        # },
     }
 }
 
