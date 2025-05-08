@@ -1,5 +1,23 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 from django.db import models
+
+
+class CustomUser(AbstractUser):
+    OFFICE_ASSISTANT = "OFFICE_ASSISTANT"
+    SUPERVISOR = "SUPERVISOR"
+    PROGRAM_COORDINATOR = "PROGRAM_COORDINATOR"
+    PGAM = "PGAM"
+    PROGRAM_CHOICES = [
+        (OFFICE_ASSISTANT, "Office Assistant"),
+        (SUPERVISOR, "Supervisor"),
+        (PROGRAM_COORDINATOR, "Program Coordinator"),
+        (PGAM, "PGAM"),
+    ]
+    role = models.CharField(max_length=20, choices=PROGRAM_CHOICES, default=OFFICE_ASSISTANT)
+    is_first_time = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.username
 
 
 class Department(models.Model):
@@ -25,7 +43,7 @@ class Lecturer(models.Model):
     title = models.IntegerField(choices=TITLE_CHOICES, default=DOCTOR)
     university = models.CharField(max_length=30)
     staff = models.OneToOneField(
-        User,
+        CustomUser,
         on_delete=models.CASCADE,
         null=True,
         blank=True,
