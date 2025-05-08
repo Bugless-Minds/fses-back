@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "fses.apps.FsesConfig",
+    "rest_framework",
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
@@ -48,7 +50,30 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
 ]
+
+# Allow frontend domain
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # or your React domain
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+# Make sure CSRF works with session auth
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+]
+
+# Use session authentication
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}
 
 ROOT_URLCONF = "fses_back.urls"
 
