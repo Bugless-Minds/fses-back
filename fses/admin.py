@@ -29,9 +29,10 @@ class CustomUserAdmin(UserAdmin):
     fieldsets = UserAdmin.fieldsets + (
         ('User Role Info', {'fields': ('role', 'is_first_time')}),
     )
-    add_fieldsets = UserAdmin.add_fieldsets + (
-        ('User Role Info', {'fields': ('role', 'is_first_time')}),
-    )
+    add_fieldsets = UserAdmin.add_fieldsets = ((None, {
+        'classes': ('wide',),
+        'fields': ('username', 'email', 'role', 'is_first_time', 'password1', 'password2'),
+    }),)
     search_fields = ('username', 'email')
     ordering = ('username',)
 
