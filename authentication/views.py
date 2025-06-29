@@ -6,6 +6,12 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authentication import SessionAuthentication
 from django.views.decorators.csrf import ensure_csrf_cookie
 from fses.models import *
+from django.db.models import Q
+from fses.models import CustomUser
+from django.core.mail import send_mail
+from django.conf import settings
+from authentication.models import PasswordReset
+from django.contrib.auth.tokens import default_token_generator
 
 
 @ensure_csrf_cookie
@@ -64,3 +70,67 @@ def update_user(request):
     user.save()
     
     return Response({'message': 'User updated successfully', 'role': user.role, 'is_first_time': user.is_first_time})
+
+
+@api_view(['POST'])
+@authentication_classes([])
+@permission_classes([AllowAny])
+def generate_password_reset_code(request):
+
+    username = request.data.get('username')
+
+    user = CustomUser.objects.filter(Q(username=username) | Q(email=username)).first()
+
+    if not user:
+        return Response({'error': 'User not found'}, status=404)
+    
+    reset_code = default_token_generator.make_token(user)
+
+    password_reset = PasswordReset.objects.filter(user=user).first()
+    if password_reset:
+        password_reset.code = reset_code
+        password_reset.save()
+    else:
+        password_reset = PasswordReset.objects.create(user=user, code=reset_code)
+    
+    print(user.email)
+
+    send_mail(
+        subject = 'FSES Password Reset',
+        message = 'Your Password Reset Code'
+        f'Hello {user.username}, your reset code is: {reset_code}'
+        f'Click here to reset your password: http://localhost:5173/reset-password?code={reset_code}',
+        from_email = settings.DEFAULT_FROM_EMAIL,
+        recipient_list = [user.email],
+    )
+    return Response({'message': 'Password reset code sent to your email'})
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def check_password_reset_code(request):
+    code = request.data.get('code')
+
+    password_reset = PasswordReset.objects.filter(code=code).first()
+
+    if not password_reset:
+        return Response({'error': 'Invalid reset code'}, status=400)
+
+    return Response({'message': 'Valid reset code'})
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def reset_password(request):
+    code = request.data.get('code')
+    new_password = request.data.get('new_password')
+
+    password_reset = PasswordReset.objects.filter(code=code).first()
+
+    if not password_reset:
+        return Response({'error': 'Invalid reset code'}, status=400)
+
+    user = password_reset.user
+    user.set_password(new_password)
+    user.save()
+
+    password_reset.delete()
+    return Response({'message': 'Password reset successfully, kindly login again'})
