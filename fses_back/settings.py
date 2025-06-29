@@ -25,7 +25,9 @@ SECRET_KEY = "django-insecure-jo@(gvqtm1bkh+1ro3rp#=ag@$@m%m)hs@&-g9c2ixj6t9eqq4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "localhost",
+]
 
 
 # Application definition
@@ -44,6 +46,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -51,19 +54,23 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    'corsheaders.middleware.CorsMiddleware',
 ]
 
 # Allow frontend domain
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # or your React domain
-]
+#CORS_ALLOWED_ORIGINS = [
+#    "http://localhost:3000",  # or your React domain
+#    "http://localhost:5173",
+#    "http://127.0.0.1:5173", 
+#
 
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = True  # Allow all origins for development; restrict in production
 
 # Make sure CSRF works with session auth
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
 ]
 
 # Use session authentication
